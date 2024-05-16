@@ -2,7 +2,7 @@
 
 ### Info
 
-* **Docer command for setting up connections** 
+* **Docker command for setting up connections** 
 ```docker
     docker run -it \
     -e POSTGRES_USER="root" \
