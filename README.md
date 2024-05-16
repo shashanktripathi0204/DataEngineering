@@ -1,6 +1,6 @@
 # DataEngineering
 
-### Info
+## Week 1 Info
 
 * **pgcli** is used for accessing the database and run queris  
 * **5432** is the standard port from postgres  
