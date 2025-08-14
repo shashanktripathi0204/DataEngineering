@@ -1,7 +1,6 @@
-
 # Weather Data Fetcher & Aggregator
 
-This Python script fetches weather data for one or more cities from the **OpenWeather API**, stores the raw data locally as JSON files, saves it into an SQLite database, and optionally aggregates daily weather metrics.
+This Python script fetches weather data for one or more cities from the **OpenWeather API**, stores the raw data locally as JSON files, saves it into an SQLite database, and optionally aggregates daily weather metrics. A **Streamlit dashboard** is also provided to visualize the stored weather data.
 
 ## Features
 - **Fetch weather data** from the [OpenWeather API](https://openweathermap.org/api)
@@ -10,6 +9,7 @@ This Python script fetches weather data for one or more cities from the **OpenWe
 - **Aggregate daily metrics** (average, min, max temperature, humidity, etc.)
 - **Run once or schedule** periodic fetching
 - **Secure API key handling** with masking in logs
+- **Visualize data** with an interactive **Streamlit dashboard**
 
 ---
 
@@ -19,12 +19,13 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
-```
 
 **requirements.txt**
 ```
 requests
 python-dotenv
+streamlit
+pandas
 ```
 > Note: SQLite is part of Python’s standard library.
 
@@ -52,33 +53,48 @@ Two tables are managed:
 
 ## Usage
 
-### 1. Run Once (No Scheduling)
+### 1. Run the Ingestor(main.py)
+This script fetches and stores weather data.
+
+#### Run Once (No Scheduling)
 ```bash
 python weather_script.py London Paris "New York"
 ```
 
-### 2. Run on Schedule
+#### Run on Schedule
 Fetch data every **N** minutes:
 ```bash
 python weather_script.py London Paris -s 30
 ```
 > Fetches every 30 minutes until stopped.
 
-### 3. Aggregate Today's Metrics
+#### Aggregate Today's Metrics
 ```bash
 python weather_script.py --aggregate today
 ```
 
-### 4. Aggregate Yesterday's Metrics
+#### Aggregate Yesterday's Metrics
 ```bash
 python weather_script.py --aggregate yesterday
 ```
 
-### 5. Aggregate Specific Date
+#### Aggregate Specific Date
 ```bash
 python weather_script.py --aggregate-date 2025-08-10
 ```
+### 2. Run the Streamlit Dashboard (app.py)
+This script visualizes the data stored in the database.
 
+#### Start the dashboard:
+```bash
+streamlit run dashboard/app.py
+```
+
+The dashboard offers two views:
+
+Last 24h (raw): Shows a line chart of raw temperature and humidity data from the last 24 hours.
+
+Daily (metrics): Displays charts of aggregated daily metrics (min, max, and average temperature, and average humidity). You can adjust the number of days to view.
 ---
 
 ## Script Arguments

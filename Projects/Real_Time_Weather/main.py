@@ -15,6 +15,14 @@ from datetime import datetime, timezone, timedelta
 
 # --------- Helper to mask API key from URLs and text content ---------
 def mask_api_key(content, api_key):
+    """
+    Mask the API key in the content.
+    If the content is a string, it replaces the API key with "***REDACTED***".
+    If the content is a dictionary or list, it recursively masks the API key in all string values.
+    Returns the modified content.
+    If the API key is not provided, it returns the content unchanged.
+    This is useful for logging and debugging purposes to avoid exposing sensitive information.
+    """
     if not api_key:
         return content
     if isinstance(content, str):
@@ -36,6 +44,21 @@ def mask_api_key(content, api_key):
     return content
 
 def fetch_and_store_weather(city, api_key, db_path, out_dir):
+    """
+    Fetch weather data for a given city using OpenWeatherMap API and store it in the database and a JSON file.
+    The city parameter can be a single city name or a comma-separated list of cities.
+    The API key is used to authenticate the request.
+    The db_path is the path to the SQLite database where the data will be stored.
+    The out_dir is the directory where the JSON file will be saved.
+    The function will create the database and tables if they do not exist.
+    The JSON file will be named in the format raw_<city>_<timestamp>.json,
+    where <city> is the city name with spaces replaced by underscores and <timestamp> is
+    the current UTC timestamp in the format YYYYMMDDTHHMMSSZ.
+    If the API request fails or the response is not valid, it will log an error message
+    and return without storing any data.
+    If the data is successfully fetched, it will log the relevant information and store it in the
+    database and the JSON file.
+    """
     params = {"appid": api_key, "q": city, "units": "metric"}
     url = "https://api.openweathermap.org/data/2.5/weather"
 
@@ -145,6 +168,16 @@ def fetch_and_store_weather(city, api_key, db_path, out_dir):
             cursor.close()
             conn.close()
 def aggregate_weather_metrics(db_path, start_ts, end_ts):
+    """
+    Aggregate weather metrics for a given date range and store them in the database.
+    The date range is defined by start_ts and end_ts, which are Unix timestamps.
+    date_str is the date in 'YYYY-MM-DD' format.
+    example: start_ts = 1700000000, end_ts = 1700086399
+    1700000000 is the start of the day in UTC, and 1700086399 is the end of the day in UTC.
+    This function aggregates metrics like average, min, and max temperature,
+    average humidity, and the number of samples for each city on that date.
+    It then inserts these metrics into the weather_metrics table.
+    """
     conn = get_db_connection(db_path)
     if conn:
             try:
@@ -188,6 +221,9 @@ def aggregate_weather_metrics(db_path, start_ts, end_ts):
                     logging.info("Database connection closed.")
 
 def run_once(cities, api_key, db_path, out_dir):
+    """
+    fetch weather data for multiple cities and store it in the database and files.
+    """
     for city in cities:
         try:
             fetch_and_store_weather(city, api_key, db_path, out_dir)
@@ -195,6 +231,11 @@ def run_once(cities, api_key, db_path, out_dir):
             logging.error(f"Failed to process city '{city}': {e}")
 
 def get_date_window_ts(date_str):
+    """
+    convert a date string in 'YYYY-MM-DD' format to a start and end timestamp for that day.
+    The start timestamp is the beginning of the day in UTC, and the end timestamp is the
+    end of the day in UTC.
+    """
     dt = datetime.strptime(date_str, "%Y-%m-%d")
     start = int(datetime(dt.year, dt.month, dt.day, tzinfo=timezone.utc).timestamp())
     end = int((datetime(dt.year, dt.month, dt.day, tzinfo=timezone.utc) + timedelta(days=1)).timestamp()) - 1
@@ -214,6 +255,7 @@ def main():
         logging.error("Missing OPENWEATHER_API_KEY in .env")
         sys.exit(1)
 
+    # Set default paths
     db_path = "data/weather_database.db"
     out_dir = "data"
 
