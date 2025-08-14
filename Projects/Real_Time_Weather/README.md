@@ -51,6 +51,7 @@ Two tables are managed:
 
 ---
 
+```
 ## Usage
 
 ### 1. Run the Ingestor(main.py)
@@ -60,7 +61,6 @@ This script fetches and stores weather data.
 ```bash
 python weather_script.py London Paris "New York"
 ```
-
 #### Run on Schedule
 Fetch data every **N** minutes:
 ```bash
@@ -135,6 +135,8 @@ Logs are handled via the `src.utils.logger` module and show:
 
 ```
 .
+├── dashboard/
+│   └── app.py              # dashboard logic
 ├── data/                   # Stores database & raw JSON files
 ├── src/
 │   └── utils/
