@@ -135,8 +135,7 @@ Logs are handled via the `src.utils.logger` module and show:
 
 ```
 .
-├── dashboard/
-│   └── app.py              # dashboard logic
+├── app.py                  # dashboard logic
 ├── data/                   # Stores database & raw JSON files
 ├── src/
 │   └── utils/
